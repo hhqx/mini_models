@@ -1,0 +1,19 @@
+models:
+  - path: /home/hqx/myprojects/mini_models/trained_models/dit_mnist_epoch_10.pth
+    name: dit_mnist
+    task: image_generation
+    description: MNIST图像生成的DiT模型
+    category: diffusion
+    version: v0.1
+  
+  # - path: /home/hqx/myprojects/mini_models/trained_models/mnist_final_model.pth
+  #   name: mnist_cnn
+  #   task: image_classification
+  #   description: 用于MNIST数字识别的简单CNN模型
+  #   category: vision
+  
+  # - path: /home/hqx/myprojects/mini_models/trained_models/resnet18_mini.pth
+  #   name: resnet18_mini
+  #   task: image_classification
+  #   description: 轻量级ResNet18，在ImageNet上训练
+  #   category: vision
