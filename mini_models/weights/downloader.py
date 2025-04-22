@@ -11,9 +11,22 @@ from typing import Optional
 from mini_models.config import config
 from mini_models.weights.registry import get_model_info
 
-def download_file(url: str, filepath: str) -> bool:
+def download_file(url: str, filepath: str, proxies: Optional[dict] = None) -> bool:
     """
     下载文件到指定路径，显示进度条
+
+    Args:
+        url (str): 文件的下载链接
+        filepath (str): 文件保存的本地路径
+        proxies (Optional[dict]): 可选的代理配置，例如 {"http": "http://proxy.com:8080", "https": "http://proxy.com:8080"}
+
+    Returns:
+        bool: 下载成功返回 True，失败返回 False
+
+    Example:
+        >>> proxies = {"http": "http://proxy.com:8080", "https": "http://proxy.com:8080"}
+        >>> download_file("http://example.com/file", "/path/to/save/file", proxies=proxies)
+        True
     """
     try:
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
@@ -22,7 +35,7 @@ def download_file(url: str, filepath: str) -> bool:
         tmp_filepath = f"{filepath}.tmp"
         
         # 发起请求
-        response = requests.get(url, stream=True)
+        response = requests.get(url, stream=True, proxies=proxies)
         response.raise_for_status()
         
         # 获取文件大小
