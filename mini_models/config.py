@@ -12,7 +12,7 @@ DEFAULT_CONFIG = {
     "cache_dir": DEFAULT_CACHE_DIR,
     "weights_dir": os.path.join(DEFAULT_CACHE_DIR, "weights"),
     "datasets_dir": os.path.join(DEFAULT_CACHE_DIR, "datasets"),
-    "download_server": "https://github.com/username/mini_models/releases/download/",
+    "download_server": "https://github.com/hhqx/mini_models/releases/download/",
     "use_cuda": True,
     "precision": "fp32",
     "log_level": "INFO",

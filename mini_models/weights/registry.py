@@ -47,6 +47,7 @@ def init_weight_registry():
     
     # 尝试从YAML加载
     for path in yaml_paths:
+        path = os.path.abspath(path)
         if os.path.exists(path):
             try:
                 with open(path, 'r') as f:
@@ -54,6 +55,8 @@ def init_weight_registry():
                 break
             except Exception as e:
                 print(f"Warning: Failed to load model info from {path}: {e}")
+        else:
+            raise ValueError(f"模型注册表文件不存在: {path}")
     
     # 如果YAML加载失败，尝试从JSON加载
     if not MODEL_REGISTRY and os.path.exists(json_path):
@@ -63,44 +66,44 @@ def init_weight_registry():
         except Exception as e:
             print(f"Warning: Failed to load model info from {json_path}: {e}")
     
-    # 如果仍然为空，使用默认值
-    if not MODEL_REGISTRY:
-        # 初始化一些默认模型（回退方案）
-        MODEL_REGISTRY = {
-            # 视觉模型
-            "resnet18_mini": {
-                "url": "v0.1/vision/resnet18_mini.pth",
-                "size": 44000000,
-                "sha256": "abcdef...",
-                "task": "image_classification",
-                "description": "轻量级ResNet18，在ImageNet上训练"
-            },
-            "mobilenet_v2_mini": {
-                "url": "v0.1/vision/mobilenet_v2_mini.pth",
-                "size": 13000000,
-                "sha256": "123456...",
-                "task": "image_classification",
-                "description": "轻量级MobileNetV2，适合移动设备"
-            },
+    # # 如果仍然为空，使用默认值
+    # if not MODEL_REGISTRY:
+    #     # 初始化一些默认模型（回退方案）
+    #     MODEL_REGISTRY = {
+    #         # 视觉模型
+    #         "resnet18_mini": {
+    #             "url": "v0.1/vision/resnet18_mini.pth",
+    #             "size": 44000000,
+    #             "sha256": "abcdef...",
+    #             "task": "image_classification",
+    #             "description": "轻量级ResNet18，在ImageNet上训练"
+    #         },
+    #         "mobilenet_v2_mini": {
+    #             "url": "v0.1/vision/mobilenet_v2_mini.pth",
+    #             "size": 13000000,
+    #             "sha256": "123456...",
+    #             "task": "image_classification",
+    #             "description": "轻量级MobileNetV2，适合移动设备"
+    #         },
             
-            # NLP模型
-            "bert_mini": {
-                "url": "v0.1/nlp/bert_mini.pth",
-                "size": 55000000,
-                "sha256": "789abc...",
-                "task": "text_classification",
-                "description": "轻量级BERT模型，6层transformer"
-            },
+    #         # NLP模型
+    #         "bert_mini": {
+    #             "url": "v0.1/nlp/bert_mini.pth",
+    #             "size": 55000000,
+    #             "sha256": "789abc...",
+    #             "task": "text_classification",
+    #             "description": "轻量级BERT模型，6层transformer"
+    #         },
             
-            # 扩散模型
-            "dit_mnist": {
-                "url": "v0.1/diffusion/dit_mnist.pth",
-                "size": 2500000,
-                "sha256": "def789...",
-                "task": "image_generation",
-                "description": "MNIST图像生成的DiT模型"
-            }
-        }
+    #         # 扩散模型
+    #         "dit_mnist": {
+    #             "url": "v0.1/diffusion/dit_mnist.pth",
+    #             "size": 2500000,
+    #             "sha256": "def789...",
+    #             "task": "image_generation",
+    #             "description": "MNIST图像生成的DiT模型"
+    #         }
+    #     }
     
     # 保存注册表
     save_registry()
@@ -149,6 +152,7 @@ def save_registry():
 
 def get_model_info(model_name: str) -> Optional[Dict[str, Any]]:
     """获取模型信息"""
+    print(MODEL_REGISTRY)
     return MODEL_REGISTRY.get(model_name)
 
 def list_models(task: Optional[str] = None) -> List[str]:

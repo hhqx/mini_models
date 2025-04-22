@@ -1,24 +1,27 @@
 """
-模型基类，定义所有模型的通用接口
+Base model class implementation
 """
+
 import os
 import torch
 import torch.nn as nn
 from typing import Dict, Any, Optional, Tuple, Union
 from abc import ABC, abstractmethod
 
-from mini_models.weights.downloader import download_if_needed
+from mini_models.weights.manager import weight_manager
 from mini_models.weights.registry import get_model_info
 
-class BaseModel(nn.Module, ABC):
-    """
-    所有mini_models模型的基类
-    """
-    def __init__(self, model_name: str, pretrained: bool = True, **kwargs):
+class BaseModel(nn.Module):
+    """模型基类"""
+    
+    def __init__(self, model_name: str, pretrained: bool = True, 
+                 weight_version: str = "latest", prefer_user_weights: bool = True, **kwargs):
         super().__init__()
         self.model_name = model_name
         self.config = kwargs
         self._is_trained = False
+        self._weight_version = weight_version
+        self._prefer_user_weights = prefer_user_weights
         
         # 初始化模型架构
         self._build_model(**kwargs)
@@ -30,25 +33,38 @@ class BaseModel(nn.Module, ABC):
     @abstractmethod
     def _build_model(self, **kwargs):
         """构建模型架构，需要子类实现"""
-        pass
+        raise NotImplementedError("子类必须实现_build_model方法")
     
     @abstractmethod
-    def forward(self, *args, **kwargs):
-        """前向传播，需要子类实现"""
-        pass
+    def forward(self, x):
+        """前向传播"""
+        raise NotImplementedError("子类必须实现forward方法")
     
-    def load_pretrained_weights(self):
-        """加载预训练权重"""
-        model_info = get_model_info(self.model_name)
-        if not model_info:
-            print(f"Warning: No registered pretrained weights found for {self.model_name}")
-            return False
+    def load_pretrained_weights(self) -> bool:
+        """
+        加载预训练权重
         
-        # 下载权重（如果本地没有）
-        weight_path = download_if_needed(self.model_name)
+        Returns:
+            bool: 是否成功加载权重
+        """
+        # 首先检查是否有可用权重
+        weight_path = weight_manager.get_weight_path(
+            self.model_name, 
+            version=self._weight_version,
+            prefer_user=self._prefer_user_weights
+        )
         
-        if not os.path.exists(weight_path):
-            print(f"Warning: Failed to download weights for {self.model_name}")
+        # 如果没有找到权重，尝试下载
+        if not weight_path:
+            print(f"未找到本地权重，尝试下载 {self.model_name}...")
+            weight_path = weight_manager.download_weight(
+                self.model_name, 
+                version=self._weight_version
+            )
+        
+        # 如果仍然没有权重，返回失败
+        if not weight_path:
+            print(f"警告：无法加载 {self.model_name} 的预训练权重")
             return False
             
         # 加载权重
@@ -61,11 +77,18 @@ class BaseModel(nn.Module, ABC):
                 state_dict = state_dict['state_dict']
                 
             # 尝试加载权重
-            self.load_state_dict(state_dict, strict=False)
+            missing_keys, unexpected_keys = self.load_state_dict(state_dict, strict=False)
+            
+            if missing_keys:
+                print(f"警告：模型加载时缺少键：{missing_keys}")
+            if unexpected_keys:
+                print(f"警告：模型加载时发现意外键：{unexpected_keys}")
+                
             self._is_trained = True
+            print(f"成功加载预训练权重：{weight_path}")
             return True
         except Exception as e:
-            print(f"Error loading weights: {e}")
+            print(f"加载权重时出错: {e}")
             return False
     
     def save_weights(self, path: str):

@@ -1,5 +1,5 @@
 dit_mnist:
-  url: v0.1/diffusion/dit_mnist.pth
+  url: v0.1.0/diffusion.dit_mnist.pth
   size: 1586578
   sha256: d7c1c77350694dac0854297860d350f37c1db85ca569565159965eab301d6ae9
   task: image_generation

@@ -6,9 +6,11 @@ import torch.nn as nn
 from typing import Dict, Any, Tuple, Optional, Union, List
 
 from mini_models.models.base import BaseModel
-from mini_models.models.vision.diffusion.time_embedding import TimeEmbedding
-from mini_models.models.vision.diffusion.dit_block import DiTBlock
-from mini_models.models import register_model
+from mini_models.models.register import register_model
+
+from .time_embedding import TimeEmbedding
+from .dit_block import DiTBlock
+
 
 class DiTModel(BaseModel):
     """

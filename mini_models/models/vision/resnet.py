@@ -6,7 +6,7 @@ import torch.nn as nn
 from typing import List, Tuple, Optional
 
 from mini_models.models.base import BaseModel
-from mini_models.models import register_model
+from mini_models.models.register import register_model
 
 class BasicBlock(nn.Module):
     """ResNet基础块"""

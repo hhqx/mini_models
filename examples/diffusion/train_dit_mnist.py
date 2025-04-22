@@ -154,7 +154,7 @@ def main():
         )
         
         # 每10个epoch保存一次模型
-        if epoch % 10 == 0:
+        if epoch % 1 == 0:
             model_path = os.path.join(args.save_dir, f"dit_mnist_epoch_{epoch}.pth")
             model.save_weights(model_path)
             logger.info(f"Model saved to {model_path}")

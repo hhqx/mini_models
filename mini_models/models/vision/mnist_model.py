@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from typing import Dict, Any, Tuple
 
 from mini_models.models.base import BaseModel
-from mini_models.models import register_model
+from mini_models.models.register import register_model
 
 class MNISTModel(BaseModel):
     """
